@@ -63,6 +63,10 @@ order. The core tables are deliberately small and explicit:
 - `care_completions` references exactly one feeding schedule, medication
   schedule, or task, plus the profile who completed it.
 
+The server-only API uses the Supabase `service_role` key. The migration grants
+that role the table privileges it needs while keeping those privileges off
+public client roles; row-level security remains enabled on the tables.
+
 Keep schema changes in a new migration rather than editing an already-applied
 migration. Regenerate Supabase database types after changing the schema, and
 review the generated function argument nullability against the SQL signatures.

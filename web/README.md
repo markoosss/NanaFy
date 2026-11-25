@@ -13,4 +13,4 @@ Use `npm test`, `npm run lint`, and `npm run build` to validate changes.
 
 ## First profile activation
 
-After the local or hosted Supabase project has the migrations and seed applied, run `npm run auth:bootstrap-admin` once from this directory. The command creates a random, single-use activation code for Marcos, stores only its SHA-256 digest, and prints the raw code once. Share it privately and activate the profile within 24 hours. The flow for issuing codes to other profiles will be added with the administration features.
+After the local or hosted Supabase project has the migrations and seed applied, run `npm run auth:bootstrap-admin` once from this directory. The command creates a random, single-use activation code for Marcos, stores only its SHA-256 digest, and prints the raw code once. Share it privately and activate the profile within 24 hours. The API for Marcos to issue codes to other profiles is `POST /api/admin/activation-codes`; its UI will be added with the administration screens.

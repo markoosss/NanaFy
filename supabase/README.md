@@ -15,10 +15,10 @@ La app usa PostgreSQL mediante Supabase. Las migraciones versionadas de `migrati
 - `notes`: apuntes compartidos, con autor y fecha de creación.
 - `care_completions`: actividad completada, día, hora y perfil que la registró.
 
-Las claves foráneas preservan las relaciones; las restricciones impiden perfiles administradores que no sean Marcos, códigos activos duplicados y más de un registro de finalización diario para la misma actividad. `activate_profile` consume el código y activa el perfil en una única transacción.
+Las claves foráneas preservan las relaciones; las restricciones impiden perfiles administradores que no sean Marcos, códigos activos duplicados y más de un registro de finalización diario para la misma actividad. `activate_profile` consume el código y activa el perfil en una única transacción; `issue_activation_code` revoca el código pendiente anterior y emite otro atómicamente.
 
 ## Seguridad y desarrollo local
 
-Todas las tablas tienen Row Level Security activado y no exponen políticas de lectura o escritura al cliente. La API del servidor debe autenticar al perfil y verificar sus permisos antes de usar la clave de servicio de Supabase; esa clave nunca debe llegar al navegador.
+Todas las tablas tienen Row Level Security activado y no exponen políticas de lectura o escritura al cliente. La API del servidor debe autenticar al perfil y verificar sus permisos antes de usar la clave de servicio de Supabase; esa clave nunca debe llegar al navegador. La matriz de permisos por rol está en `../web/src/lib/auth/permissions.ts`: solo Marcos administra perfiles, códigos y horarios; la familia administra calendario y notas; Invitado puede consultar cuidados y registrar tareas, pero no administrar ni borrar historial.
 
 Con Docker instalado, ejecuta `npx supabase start` y luego `npx supabase db reset` para crear la base local, aplicar migraciones y cargar los perfiles iniciales. `db reset` elimina y recrea la base local; no lo uses contra datos de producción.

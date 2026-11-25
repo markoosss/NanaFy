@@ -249,6 +249,9 @@ isOneToOne: false
           Functions: {
             "activate_profile":
 { Args: { "p_code_hash": string,"p_password_hash": string,"p_profile_key": string }; Returns: boolean
+                           },
+"issue_activation_code":
+{ Args: { "p_code_hash": string,"p_created_by": string,"p_expires_at": string,"p_profile_key": string }; Returns: boolean
                            }
           }
           Enums: {

@@ -252,6 +252,15 @@ isOneToOne: false
                            },
 "issue_activation_code":
 { Args: { "p_code_hash": string,"p_created_by": string,"p_expires_at": string,"p_profile_key": string }; Returns: boolean
+                           },
+"save_care_task":
+{ Args: { "p_created_by": string,"p_day_of_week": number,"p_id": string | null,"p_instructions": string | null,"p_is_active": boolean,"p_scheduled_time": string | null,"p_task_name": string }; Returns: string | null
+                           },
+"save_feeding_schedule":
+{ Args: { "p_created_by": string,"p_day_of_week": number,"p_id": string | null,"p_is_active": boolean,"p_meal_name": string,"p_portion": string | null,"p_scheduled_time": string }; Returns: string | null
+                           },
+"save_medication_schedule":
+{ Args: { "p_created_by": string,"p_end_date": string | null,"p_id": string | null,"p_instructions": string | null,"p_is_active": boolean,"p_medication_name": string,"p_start_date": string,"p_times": Json }; Returns: string | null
                            }
           }
           Enums: {

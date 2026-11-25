@@ -14,7 +14,7 @@
 
 ## 3. Cuidados y registros
 
-- [ ] 3.1 Implementar gestión de horarios de alimentación, medicación y tareas extra, incluida la vista diaria y la sección de medicación; verificar operaciones y casos límite con pruebas de API.
+- [x] 3.1 Implementar gestión de horarios de alimentación, medicación y tareas extra, incluida la vista diaria y la sección de medicación; verificar operaciones y casos límite con pruebas de API.
 - [ ] 3.2 Implementar calendario veterinario y notas compartidas con sus permisos correspondientes; verificar altas y consultas desde perfiles familiares y lectura permitida a Invitado en el calendario.
 - [ ] 3.3 Implementar registros de finalización con perfil y hora; verificar que el historial persiste, se comparte entre perfiles y no modifica los horarios planificados.
 - [ ] 3.4 Documentar los flujos de cuidados y el modelo de datos; verificar que los pasos documentados coinciden con la app y las migraciones.

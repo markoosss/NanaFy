@@ -3,7 +3,7 @@
 ## 1. Fundamentos y datos
 
 - [x] 1.1 Confirmar Vercel + Supabase como destino; documentar Functions, PostgreSQL, HTTPS y las opciones de copia automática o exportación manual según el plan, dejando el dominio propio para la publicación.
-- [ ] 1.2 Preparar la estructura del cliente web y la API; verificar que ambos arrancan localmente y que la comprobación de salud de la API responde correctamente.
+- [x] 1.2 Preparar la estructura del cliente web y la API; verificar que ambos arrancan localmente y que la comprobación de salud de la API responde correctamente.
 - [ ] 1.3 Crear migraciones y datos iniciales para los cinco perfiles y las tablas de cuidados; verificar una instalación limpia, claves foráneas y documentación legible del esquema.
 
 ## 2. Cuentas y permisos

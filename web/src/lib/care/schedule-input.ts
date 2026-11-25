@@ -1,4 +1,5 @@
 import { isRecord } from "@/lib/http/json";
+import { isUuid, isValidIsoDate } from "@/lib/care/date";
 
 type ScheduleTime = {
   dayOfWeek: number;
@@ -34,8 +35,6 @@ export type CareScheduleInput =
       times: ScheduleTime[];
     });
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 function isNonEmptyText(value: unknown, maxLength: number): value is string {
@@ -69,15 +68,6 @@ function isDayOfWeek(value: unknown): value is number {
 
 function isValidTime(value: unknown): value is string {
   return typeof value === "string" && TIME_PATTERN.test(value);
-}
-
-function isValidDate(value: unknown): value is string {
-  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return false;
-  }
-
-  const parsed = new Date(`${value}T00:00:00.000Z`);
-  return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
 }
 
 function parseTimes(value: unknown): ScheduleTime[] | null {
@@ -120,7 +110,7 @@ export function parseCareScheduleInput(value: unknown): CareScheduleInput | null
   const id =
     value.id === undefined
       ? undefined
-      : typeof value.id === "string" && UUID_PATTERN.test(value.id)
+      : typeof value.id === "string" && isUuid(value.id)
         ? value.id
         : null;
 
@@ -190,8 +180,10 @@ export function parseCareScheduleInput(value: unknown): CareScheduleInput | null
     if (
       !isNonEmptyText(value.medicationName, 120) ||
       !isNonEmptyText(value.instructions, 1000) ||
-      !isValidDate(value.startDate) ||
-      (endDate !== null && !isValidDate(endDate)) ||
+      typeof value.startDate !== "string" ||
+      !isValidIsoDate(value.startDate) ||
+      (endDate !== null &&
+        (typeof endDate !== "string" || !isValidIsoDate(endDate))) ||
       (endDate !== null && endDate < value.startDate) ||
       !times
     ) {

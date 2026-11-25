@@ -1,23 +1,10 @@
 import { cookies } from "next/headers";
 import { getCurrentProfile, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 import { authorizeProfile } from "@/lib/auth/permissions";
+import { getIsoDayOfWeek, isValidIsoDate } from "@/lib/care/date";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const NO_STORE_HEADERS = { "Cache-Control": "no-store" };
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
-function isValidDate(value: string): boolean {
-  if (!DATE_PATTERN.test(value)) {
-    return false;
-  }
-
-  const parsed = new Date(`${value}T00:00:00.000Z`);
-  return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
-}
-
-function getIsoDayOfWeek(value: string): number {
-  return new Date(`${value}T00:00:00.000Z`).getUTCDay() || 7;
-}
 
 export async function GET(request: Request) {
   const token = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
@@ -33,7 +20,7 @@ export async function GET(request: Request) {
     const requestedDate = new URL(request.url).searchParams.get("date");
     const date = requestedDate ?? new Date().toISOString().slice(0, 10);
 
-    if (!isValidDate(date)) {
+    if (!isValidIsoDate(date)) {
       return Response.json(
         { error: "La fecha indicada no es válida." },
         { status: 400, headers: NO_STORE_HEADERS },

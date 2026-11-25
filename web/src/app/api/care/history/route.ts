@@ -51,7 +51,7 @@ export async function GET(request: Request) {
     const { data: completions, error: completionError } = await supabase
       .from("care_completions")
       .select(
-        "id, activity_date, feeding_schedule_id, medication_schedule_id, care_task_id, completed_by, completed_at",
+        "id, activity_date, feeding_schedule_id, medication_schedule_id, care_task_id, completed_by, completed_at, observation",
       )
       .gte("activity_date", range.from)
       .lte("activity_date", range.to)
@@ -136,6 +136,7 @@ export async function GET(request: Request) {
             completedByName:
               profileByKey.get(completion.completed_by) ?? completion.completed_by,
             completedAt: completion.completed_at,
+            observation: completion.observation,
           };
         }),
       },

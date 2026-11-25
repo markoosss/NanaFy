@@ -33,7 +33,7 @@ function getRequestUrl(input: RequestInfo | URL): string {
   return input instanceof URL ? input.toString() : input.url;
 }
 
-function completionRequest() {
+function completionRequest(observation?: string) {
   return new Request("http://localhost/api/care/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -41,6 +41,7 @@ function completionRequest() {
       activityType: "feeding",
       scheduleId,
       activityDate,
+      ...(observation !== undefined ? { observation } : {}),
     }),
   });
 }
@@ -78,6 +79,7 @@ describe("care completion API", () => {
           feeding_schedule_id: scheduleId,
           activity_date: activityDate,
           completed_by: "invitado",
+          observation: null,
         });
 
         return Response.json(
@@ -86,6 +88,7 @@ describe("care completion API", () => {
             activity_date: activityDate,
             completed_by: "invitado",
             completed_at: "2026-11-25T10:00:00.000Z",
+            observation: null,
           },
           { status: 201 },
         );
@@ -101,7 +104,53 @@ describe("care completion API", () => {
     expect(result.completion).toMatchObject({
       activityDate,
       completedBy: "invitado",
+      observation: null,
     });
+  });
+
+  it("trims and stores an optional observation", async () => {
+    mockFetch.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const { pathname } = new URL(getRequestUrl(input));
+
+      if (pathname.endsWith("/feeding_schedules")) {
+        return Response.json({ day_of_week: dayOfWeek });
+      }
+
+      if (pathname.endsWith("/care_completions")) {
+        expect(JSON.parse(String(init?.body))).toMatchObject({
+          observation: "Nana comió menos de lo habitual",
+        });
+        return Response.json(
+          {
+            id: "completion-2",
+            activity_date: activityDate,
+            completed_by: "invitado",
+            completed_at: "2026-11-25T10:00:00.000Z",
+            observation: "Nana comió menos de lo habitual",
+          },
+          { status: 201 },
+        );
+      }
+
+      throw new Error(`Unexpected Supabase request: ${pathname}`);
+    });
+
+    const response = await POST(
+      completionRequest("  Nana comió menos de lo habitual  "),
+    );
+    const result = await response.json();
+
+    expect(response.status).toBe(201);
+    expect(result.completion.observation).toBe(
+      "Nana comió menos de lo habitual",
+    );
+  });
+
+  it("rejects observations longer than 1000 characters", async () => {
+    const response = await POST(completionRequest("x".repeat(1001)));
+
+    expect(response.status).toBe(400);
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
   it("rejects completion when the schedule is not planned for that weekday", async () => {

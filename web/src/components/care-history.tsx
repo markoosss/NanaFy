@@ -99,6 +99,11 @@ export function CareHistory() {
                 <p className="mt-1 text-sm text-foreground/60">
                   Completado por {entry.completedByName}
                 </p>
+                {entry.observation ? (
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-foreground/70">
+                    Observación: {entry.observation}
+                  </p>
+                ) : null}
               </div>
               <time
                 className="text-xs text-foreground/50"

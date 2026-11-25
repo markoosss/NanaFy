@@ -11,6 +11,7 @@ export type CareActivity = {
   times: string[];
   isCompleted: boolean;
   completedBy: string | null;
+  completedObservation: string | null;
 };
 
 export type DailyCareData = {
@@ -43,6 +44,7 @@ export type CareHistoryEntry = {
   scheduledTime: string | null;
   completedByName: string;
   completedAt: string;
+  observation: string | null;
 };
 
 export type MedicationTime = {
@@ -173,6 +175,7 @@ function parseCareActivity(
     times,
     isCompleted: requireBoolean(record, "isCompleted"),
     completedBy: optionalString(record, "completedBy"),
+    completedObservation: optionalString(record, "completedObservation"),
   };
 }
 
@@ -243,6 +246,7 @@ export function parseCareHistory(value: unknown): CareHistoryEntry[] {
       scheduledTime: optionalString(entry, "scheduledTime"),
       completedByName: requireString(entry, "completedByName"),
       completedAt: requireString(entry, "completedAt"),
+      observation: optionalString(entry, "observation"),
     };
   });
 }

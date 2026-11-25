@@ -11,6 +11,7 @@ import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const NO_STORE_HEADERS = { "Cache-Control": "no-store" };
 type ActivityType = "feeding" | "medication" | "task";
+const MAX_OBSERVATION_LENGTH = 1000;
 
 function isActivityType(value: unknown): value is ActivityType {
   return value === "feeding" || value === "medication" || value === "task";
@@ -28,13 +29,17 @@ export async function POST(request: Request) {
     }
 
     const body = await readJsonBody(request);
+    const observation = isRecord(body) ? body.observation ?? null : null;
     if (
       !isRecord(body) ||
       !isActivityType(body.activityType) ||
       typeof body.scheduleId !== "string" ||
       !isUuid(body.scheduleId) ||
       typeof body.activityDate !== "string" ||
-      !isValidIsoDate(body.activityDate)
+      !isValidIsoDate(body.activityDate) ||
+      (observation !== null &&
+        (typeof observation !== "string" ||
+          observation.length > MAX_OBSERVATION_LENGTH))
     ) {
       return Response.json(
         { error: "Los datos de la tarea completada no son válidos." },
@@ -145,11 +150,13 @@ export async function POST(request: Request) {
       medication_schedule_id:
         body.activityType === "medication" ? body.scheduleId : null,
       care_task_id: body.activityType === "task" ? body.scheduleId : null,
+      observation:
+        typeof observation === "string" ? observation.trim() || null : null,
     };
     const { data, error } = await supabase
       .from("care_completions")
       .insert(completion)
-      .select("id, activity_date, completed_by, completed_at")
+      .select("id, activity_date, completed_by, completed_at, observation")
       .single();
 
     if (error?.code === "23505") {
@@ -174,6 +181,7 @@ export async function POST(request: Request) {
           activityDate: data.activity_date,
           completedBy: data.completed_by,
           completedAt: data.completed_at,
+          observation: data.observation,
         },
       },
       { status: 201, headers: NO_STORE_HEADERS },

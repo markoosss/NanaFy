@@ -45,6 +45,8 @@ export function CareScheduleSection({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingId, setIsSavingId] = useState<string | null>(null);
+  const [completionTarget, setCompletionTarget] = useState<string | null>(null);
+  const [observation, setObservation] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -82,7 +84,8 @@ export function CareScheduleSection({
   }, [date, reloadKey]);
 
   async function completeActivity(activity: CareActivity) {
-    setIsSavingId(activity.id);
+    const activityKey = `${activity.activityType}:${activity.id}`;
+    setIsSavingId(activityKey);
     setError(null);
     try {
       await requestJson("/api/care/completions", {
@@ -92,8 +95,11 @@ export function CareScheduleSection({
           activityType: activity.activityType,
           scheduleId: activity.id,
           activityDate: date,
+          observation: observation.trim() || null,
         }),
       });
+      setCompletionTarget(null);
+      setObservation("");
       setReloadKey((key) => key + 1);
     } catch (completionError) {
       setError(
@@ -129,7 +135,11 @@ export function CareScheduleSection({
           <input
             className="mt-1 block min-h-11 rounded-xl border border-foreground/15 bg-white px-3"
             id={`care-date-${mode}`}
-            onChange={(event) => setDate(event.target.value)}
+            onChange={(event) => {
+              setDate(event.target.value);
+              setCompletionTarget(null);
+              setObservation("");
+            }}
             type="date"
             value={date}
           />
@@ -153,62 +163,124 @@ export function CareScheduleSection({
         </p>
       ) : (
         <div className="mt-6 grid gap-3 lg:grid-cols-2">
-          {activities.map((activity) => (
-            <article
-              className="rounded-2xl border border-foreground/10 bg-white/80 p-5"
-              key={`${activity.activityType}:${activity.id}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-foreground/50">
-                    {labelForActivity(activity)}
-                  </p>
-                  <h3 className="mt-2 text-lg font-semibold">{activity.title}</h3>
-                  {activity.detail ? (
-                    <p className="mt-1 text-sm leading-6 text-foreground/65">
-                      {activity.detail}
+          {activities.map((activity) => {
+            const activityKey = `${activity.activityType}:${activity.id}`;
+            const isCompletionFormOpen = completionTarget === activityKey;
+
+            return (
+              <article
+                className="rounded-2xl border border-foreground/10 bg-white/80 p-5"
+                key={activityKey}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-foreground/50">
+                      {labelForActivity(activity)}
                     </p>
-                  ) : null}
-                  {activity.activityType === "medication" &&
-                  activity.times.length > 0 ? (
-                    <p className="mt-3 text-sm text-foreground/70">
-                      Horas: {activity.times.map(formatTime).join(", ")}
-                    </p>
-                  ) : activity.scheduledTime ? (
-                    <p className="mt-3 text-sm text-foreground/70">
-                      Hora: {formatTime(activity.scheduledTime)}
-                    </p>
-                  ) : null}
+                    <h3 className="mt-2 text-lg font-semibold">
+                      {activity.title}
+                    </h3>
+                    {activity.detail ? (
+                      <p className="mt-1 text-sm leading-6 text-foreground/65">
+                        {activity.detail}
+                      </p>
+                    ) : null}
+                    {activity.activityType === "medication" &&
+                    activity.times.length > 0 ? (
+                      <p className="mt-3 text-sm text-foreground/70">
+                        Horas: {activity.times.map(formatTime).join(", ")}
+                      </p>
+                    ) : activity.scheduledTime ? (
+                      <p className="mt-3 text-sm text-foreground/70">
+                        Hora: {formatTime(activity.scheduledTime)}
+                      </p>
+                    ) : null}
+                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+                      activity.isCompleted
+                        ? "bg-lime-100 text-emerald-900"
+                        : "bg-amber-100 text-amber-900"
+                    }`}
+                  >
+                    {activity.isCompleted ? "Hecho" : "Pendiente"}
+                  </span>
                 </div>
-                <span
-                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
-                    activity.isCompleted
-                      ? "bg-lime-100 text-emerald-900"
-                      : "bg-amber-100 text-amber-900"
-                  }`}
-                >
-                  {activity.isCompleted ? "Hecho" : "Pendiente"}
-                </span>
-              </div>
-              {activity.isCompleted ? (
-                <p className="mt-4 text-xs text-foreground/55">
-                  Completado por{" "}
-                  {activity.completedBy === profile.profileKey
-                    ? "ti"
-                    : completedByName(activity.completedBy)}
-                </p>
-              ) : (
-                <button
-                  className="mt-5 min-h-11 rounded-xl bg-foreground px-4 text-sm font-semibold text-background transition hover:bg-foreground/90 disabled:opacity-60"
-                  disabled={isSavingId === activity.id}
-                  onClick={() => void completeActivity(activity)}
-                  type="button"
-                >
-                  {isSavingId === activity.id ? "Guardando..." : "Marcar como hecho"}
-                </button>
-              )}
-            </article>
-          ))}
+                {activity.isCompleted ? (
+                  <div className="mt-4 space-y-2">
+                    <p className="text-xs text-foreground/55">
+                      Completado por{" "}
+                      {activity.completedBy === profile.profileKey
+                        ? "ti"
+                        : completedByName(activity.completedBy)}
+                    </p>
+                    {activity.completedObservation ? (
+                      <p className="whitespace-pre-wrap text-sm leading-6 text-foreground/70">
+                        Observación: {activity.completedObservation}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : isCompletionFormOpen ? (
+                  <form
+                    className="mt-4 space-y-3"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      void completeActivity(activity);
+                    }}
+                  >
+                    <label
+                      className="block text-sm font-medium"
+                      htmlFor={`completion-observation-${activityKey}`}
+                    >
+                      Observación (opcional)
+                      <textarea
+                        className="mt-2 min-h-20 w-full rounded-xl border border-foreground/15 bg-background p-3"
+                        id={`completion-observation-${activityKey}`}
+                        maxLength={1000}
+                        onChange={(event) => setObservation(event.target.value)}
+                        placeholder="Añade un detalle si hace falta"
+                        value={observation}
+                      />
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        className="min-h-11 rounded-xl bg-foreground px-4 text-sm font-semibold text-background transition hover:bg-foreground/90 disabled:opacity-60"
+                        disabled={isSavingId === activityKey}
+                        type="submit"
+                      >
+                        {isSavingId === activityKey
+                          ? "Guardando..."
+                          : "Marcar como hecho"}
+                      </button>
+                      <button
+                        className="min-h-11 rounded-xl border border-foreground/15 px-4 text-sm font-semibold disabled:opacity-60"
+                        disabled={isSavingId === activityKey}
+                        onClick={() => {
+                          setCompletionTarget(null);
+                          setObservation("");
+                        }}
+                        type="button"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <button
+                    className="mt-5 min-h-11 rounded-xl bg-foreground px-4 text-sm font-semibold text-background transition hover:bg-foreground/90 disabled:opacity-60"
+                    disabled={isSavingId === activityKey}
+                    onClick={() => {
+                      setCompletionTarget(activityKey);
+                      setObservation("");
+                    }}
+                    type="button"
+                  >
+                    Marcar como hecho
+                  </button>
+                )}
+              </article>
+            );
+          })}
         </div>
       )}
     </div>

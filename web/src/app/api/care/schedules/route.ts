@@ -57,7 +57,7 @@ export async function GET(request: Request) {
         supabase
           .from("care_completions")
           .select(
-            "feeding_schedule_id, medication_schedule_id, care_task_id, completed_by, completed_at",
+            "feeding_schedule_id, medication_schedule_id, care_task_id, completed_by, completed_at, observation",
           )
           .eq("activity_date", date),
       ]);
@@ -109,7 +109,7 @@ export async function GET(request: Request) {
 
     const completionBySchedule = new Map<
       string,
-      { completedBy: string; completedAt: string }
+      { completedBy: string; completedAt: string; observation: string | null }
     >();
 
     for (const completion of completionsResult.data ?? []) {
@@ -117,6 +117,7 @@ export async function GET(request: Request) {
         completionBySchedule.set(`feeding:${completion.feeding_schedule_id}`, {
           completedBy: completion.completed_by,
           completedAt: completion.completed_at,
+          observation: completion.observation,
         });
       }
 
@@ -126,6 +127,7 @@ export async function GET(request: Request) {
           {
             completedBy: completion.completed_by,
             completedAt: completion.completed_at,
+            observation: completion.observation,
           },
         );
       }
@@ -134,6 +136,7 @@ export async function GET(request: Request) {
         completionBySchedule.set(`task:${completion.care_task_id}`, {
           completedBy: completion.completed_by,
           completedAt: completion.completed_at,
+          observation: completion.observation,
         });
       }
     }
@@ -157,6 +160,7 @@ export async function GET(request: Request) {
             isCompleted: completion !== null,
             completedBy: completion?.completedBy ?? null,
             completedAt: completion?.completedAt ?? null,
+            completedObservation: completion?.observation ?? null,
           };
         }),
         medications: medications.map((medication) => {
@@ -174,6 +178,7 @@ export async function GET(request: Request) {
             isCompleted: completion !== null,
             completedBy: completion?.completedBy ?? null,
             completedAt: completion?.completedAt ?? null,
+            completedObservation: completion?.observation ?? null,
           };
         }),
         tasks: (tasksResult.data ?? []).map((task) => {
@@ -188,6 +193,7 @@ export async function GET(request: Request) {
             isCompleted: completion !== null,
             completedBy: completion?.completedBy ?? null,
             completedAt: completion?.completedAt ?? null,
+            completedObservation: completion?.observation ?? null,
           };
         }),
       },

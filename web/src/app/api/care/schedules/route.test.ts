@@ -100,6 +100,7 @@ describe("daily care schedule API", () => {
             care_task_id: null,
             completed_by: "mama",
             completed_at: "2026-01-05T07:55:00.000Z",
+            observation: "Dejó algo de comida",
           },
         ]);
       }
@@ -128,6 +129,7 @@ describe("daily care schedule API", () => {
       mealName: "Desayuno",
       isCompleted: true,
       completedBy: "mama",
+      completedObservation: "Dejó algo de comida",
     });
     expect(result.medications[0]).toMatchObject({
       medicationName: "Tratamiento",
@@ -138,6 +140,7 @@ describe("daily care schedule API", () => {
     expect(result.tasks[0]).toMatchObject({
       taskName: "Cambiar agua",
       isCompleted: false,
+      completedObservation: null,
     });
   });
 

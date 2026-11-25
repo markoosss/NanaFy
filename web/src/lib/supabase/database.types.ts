@@ -71,14 +71,14 @@ isOneToOne: false
                   ]
                 },"care_completions": {
                   Row: {
-                    "activity_date": string,"care_task_id": string | null,"completed_at": string,"completed_by": string,"feeding_schedule_id": string | null,"id": string,"medication_schedule_id": string | null
+                    "activity_date": string,"care_task_id": string | null,"completed_at": string,"completed_by": string,"feeding_schedule_id": string | null,"id": string,"medication_schedule_id": string | null,"observation": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "activity_date": string,"care_task_id"?: string | null,"completed_at"?: string,"completed_by": string,"feeding_schedule_id"?: string | null,"id"?: string,"medication_schedule_id"?: string | null
+                    "activity_date": string,"care_task_id"?: string | null,"completed_at"?: string,"completed_by": string,"feeding_schedule_id"?: string | null,"id"?: string,"medication_schedule_id"?: string | null,"observation"?: string | null
                   }
                   Update: {
-                    "activity_date"?: string,"care_task_id"?: string | null,"completed_at"?: string,"completed_by"?: string,"feeding_schedule_id"?: string | null,"id"?: string,"medication_schedule_id"?: string | null
+                    "activity_date"?: string,"care_task_id"?: string | null,"completed_at"?: string,"completed_by"?: string,"feeding_schedule_id"?: string | null,"id"?: string,"medication_schedule_id"?: string | null,"observation"?: string | null
                   }
                   Relationships: [
                     {

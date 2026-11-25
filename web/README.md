@@ -42,12 +42,13 @@ profile's permission before accessing the database.
 | `POST`, `PATCH /api/admin/care-schedules` | Create or update care schedules | Marcos |
 | `GET`, `POST /api/care/calendar` | Read shared appointments or add one | Read: family and guest; write: family |
 | `GET`, `POST /api/care/notes` | Read or add household notes | Family |
-| `POST /api/care/completions` | Mark one scheduled activity complete | Family and guest |
+| `POST /api/care/completions` | Complete one scheduled activity with an optional observation (up to 1000 characters) | Family and guest |
 | `GET /api/care/history` | Review completion history for a date range | Family and guest |
 | `POST /api/admin/activation-codes` | Issue a one-time profile activation code | Marcos |
 
 Completion entries are separate from schedules. The database records the
-activity date, authenticated profile, and server timestamp, and unique indexes
+activity date, authenticated profile, server timestamp, and an optional
+observation shown on the daily plan and completion history. Unique indexes
 prevent completing the same schedule twice on one date.
 
 ## Database map
@@ -61,7 +62,8 @@ order. The core tables are deliberately small and explicit:
   `medication_schedule_times`, and `care_tasks` hold planned routines.
 - `calendar_events` and `notes` hold shared appointments and household notes.
 - `care_completions` references exactly one feeding schedule, medication
-  schedule, or task, plus the profile who completed it.
+  schedule, or task, plus the profile who completed it and an optional
+  observation.
 
 The server-only API uses the Supabase `service_role` key. The migration grants
 that role the table privileges it needs while keeping those privileges off

@@ -2,6 +2,8 @@
 
 The mobile-first web client and API for NanaFy.
 
+On each sign-in, choose a profile, enter its password, then select mobile or computer for that session.
+
 ## Local development
 
 1. Start the local database with Docker: `npx supabase start`.

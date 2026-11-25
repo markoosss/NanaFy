@@ -86,7 +86,7 @@ export function CareDashboard({
               Hola, {profile.displayName}
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-background/75 sm:text-base">
-              Alimentación, medicación, tareas y citas de Kiro, en un solo lugar.
+              Alimentación, medicación, tareas y citas de Nana, en un solo lugar.
             </p>
           </div>
           <p className="shrink-0 rounded-2xl border border-background/15 bg-background/5 px-4 py-3 text-sm text-background/75">

@@ -84,7 +84,7 @@ export function CareNotes({ profiles }: CareNotesProps) {
         Apuntes compartidos
       </p>
       <h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-        Notas de Kiro
+        Notas de Nana
       </h2>
 
       <form

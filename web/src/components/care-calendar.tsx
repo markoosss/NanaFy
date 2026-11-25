@@ -127,7 +127,7 @@ export function CareCalendar({ profile }: CareCalendarProps) {
             Citas y revisiones
           </p>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-            Calendario de Kiro
+            Calendario de Nana
           </h2>
         </div>
         <label className="text-sm font-medium" htmlFor="calendar-month">

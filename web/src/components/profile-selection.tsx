@@ -25,7 +25,7 @@ export function ProfileSelection({
         className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl"
         id="profile-selection-title"
       >
-        ¿Quién va a cuidar de Kiro?
+        ¿Quién va a cuidar de Nana?
       </h1>
       <p className="mt-3 text-sm leading-6 text-foreground/60 sm:text-base">
         Elige tu perfil para continuar.

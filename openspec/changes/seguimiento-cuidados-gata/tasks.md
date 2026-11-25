@@ -8,7 +8,7 @@
 
 ## 2. Cuentas y permisos
 
-- [ ] 2.1 Implementar activación por código de un solo uso y contraseñas individuales almacenadas como hashes; verificar activación válida, reutilización rechazada y autenticación correcta.
+- [x] 2.1 Implementar activación por código de un solo uso y contraseñas individuales almacenadas como hashes; verificar activación válida, reutilización rechazada y autenticación correcta.
 - [ ] 2.2 Aplicar permisos en la API para Marcos, los perfiles familiares e Invitado; verificar que las pruebas permiten las acciones autorizadas y rechazan cambios de configuración y borrado de historial por Invitado.
 - [ ] 2.3 Implementar selección de perfil, inicio de sesión y pregunta móvil/PC en cada sesión; verificar el orden perfil, contraseña, dispositivo y acceso a la app.
 

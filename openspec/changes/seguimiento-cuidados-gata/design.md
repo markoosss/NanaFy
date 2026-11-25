@@ -27,13 +27,15 @@ Supabase documents daily automatic backups for Pro, Team, and Enterprise plans. 
 
 ### Keep the data model explicit
 
-Use a small set of named tables with clear foreign keys: `profiles`, `activation_codes`, `feeding_schedules`, `medication_schedules`, `care_tasks`, `calendar_events`, `notes`, and `care_completions`. Completion records reference the profile that performed the activity and store its completion time. Use schema migrations to make database changes reviewable.
+Use a small set of named tables with clear foreign keys: `profiles`, `activation_codes`, `profile_sessions`, `feeding_schedules`, `medication_schedules`, `care_tasks`, `calendar_events`, `notes`, and `care_completions`. Completion records reference the profile that performed the activity and store its completion time. Use schema migrations to make database changes reviewable.
 
 The database is the source of truth for live data. Include the five initial profiles as non-secret seed data, but do not let routine seed runs overwrite values changed in the app. Marcos manages profiles and care settings through the admin UI; code-level defaults and schema changes remain visible in the project for maintainers.
 
 ### Enforce authentication and permissions in the API
 
 Store password hashes, never plaintext passwords. Marcos creates one-time activation codes for profiles; each code is stored in a non-reversible form and can activate only its intended profile once. The API checks profile permissions for every administrative or care-record operation; hiding controls in the web client is not sufficient authorization.
+
+Generate Marcos's initial activation code with a private local setup command that stores only its hash and displays the raw code once. After Marcos activates the account, he creates the other profile codes from the admin UI. Store only hashes of opaque, revocable session tokens in the database; send the raw token only in an HTTP-only, same-site cookie.
 
 ### Make device choice a presentation preference for that login
 

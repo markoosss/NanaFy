@@ -6,6 +6,7 @@ La app usa PostgreSQL mediante Supabase. Las migraciones versionadas de `migrati
 
 - `profiles`: identidad, nombre visible, rol y estado de activación de cada perfil.
 - `activation_codes`: hash del código de un solo uso, perfil destinatario, vencimiento y estado de uso o revocación.
+- `profile_sessions`: hash de cada sesión, perfil, vencimiento y revocación.
 - `feeding_schedules`: toma, porción opcional, día de la semana y hora.
 - `medication_schedules`: medicamento, instrucciones y fechas de vigencia.
 - `medication_schedule_times`: días y horas de cada medicamento.
@@ -14,7 +15,7 @@ La app usa PostgreSQL mediante Supabase. Las migraciones versionadas de `migrati
 - `notes`: apuntes compartidos, con autor y fecha de creación.
 - `care_completions`: actividad completada, día, hora y perfil que la registró.
 
-Las claves foráneas preservan las relaciones; las restricciones impiden perfiles administradores que no sean Marcos, códigos activos duplicados y más de un registro de finalización diario para la misma actividad.
+Las claves foráneas preservan las relaciones; las restricciones impiden perfiles administradores que no sean Marcos, códigos activos duplicados y más de un registro de finalización diario para la misma actividad. `activate_profile` consume el código y activa el perfil en una única transacción.
 
 ## Seguridad y desarrollo local
 

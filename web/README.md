@@ -13,6 +13,19 @@ On each sign-in, choose a profile, enter its password, then select mobile or com
 
 Use `npm test`, `npm run lint`, and `npm run build` to validate changes.
 
+## Sign-in and app screens
+
+Each visit starts with profile selection. An inactive profile enters its
+single-use activation code and creates a password; an activated profile signs
+in with its password. Every successful sign-in asks for mobile or computer
+presentation before opening the dashboard.
+
+The dashboard offers today's feeding, medication, and extra tasks; a dedicated
+medication view; monthly veterinary and care events; shared notes; and the
+completion history. Marcos also sees the administration screen for activation
+codes and care schedules. Guest profiles can review the care plan, calendar,
+and history and record completions, but cannot see notes or administration.
+
 ## First profile activation
 
 After the local or hosted Supabase project has the migrations and seed applied, run `npm run auth:bootstrap-admin` once from this directory. The command creates a random, single-use activation code for Marcos, stores only its SHA-256 digest, and prints the raw code once. Share it privately and activate the profile within 24 hours. The API for Marcos to issue codes to other profiles is `POST /api/admin/activation-codes`; the dashboard administration screen will expose it.

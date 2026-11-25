@@ -1,50 +1,57 @@
 "use client";
 
+import { useState } from "react";
 import type { AuthenticatedProfile } from "@/lib/auth/session";
 import type { DeviceMode } from "@/components/app-types";
+import type { HouseholdProfile } from "@/components/profile-selection";
+import { CareCalendar } from "@/components/care-calendar";
+import { CareHistory } from "@/components/care-history";
+import { CareNotes } from "@/components/care-notes";
+import { CareScheduleSection } from "@/components/care-schedule-section";
+import { CareAdministration } from "@/components/care-administration";
 
 type CareDashboardProps = {
   profile: AuthenticatedProfile;
+  profiles: HouseholdProfile[];
   deviceMode: DeviceMode;
   error: string | null;
   onLogout: () => Promise<void>;
 };
 
-const careAreas = [
-  {
-    number: "01",
-    title: "Alimentación",
-    description: "Horarios claros y registro de cada toma.",
-  },
-  {
-    number: "02",
-    title: "Medicación",
-    description: "Indicaciones y próximas tomas siempre a mano.",
-  },
-  {
-    number: "03",
-    title: "Tareas extra",
-    description: "Arenero, agua y otras tareas de cuidado.",
-  },
-  {
-    number: "04",
-    title: "Calendario y notas",
-    description: "Citas, revisiones y apuntes compartidos.",
-  },
+type SectionId =
+  | "today"
+  | "medications"
+  | "calendar"
+  | "notes"
+  | "history"
+  | "administration";
+
+const sections: { id: SectionId; title: string; roles: string[] }[] = [
+  { id: "today", title: "Hoy", roles: ["admin", "family", "guest"] },
+  { id: "medications", title: "Medicación", roles: ["admin", "family", "guest"] },
+  { id: "calendar", title: "Calendario", roles: ["admin", "family", "guest"] },
+  { id: "notes", title: "Notas", roles: ["admin", "family"] },
+  { id: "history", title: "Historial", roles: ["admin", "family", "guest"] },
+  { id: "administration", title: "Administrar", roles: ["admin"] },
 ];
 
 export function CareDashboard({
   profile,
+  profiles,
   deviceMode,
   error,
   onLogout,
 }: CareDashboardProps) {
+  const [activeSection, setActiveSection] = useState<SectionId>("today");
+  const visibleSections = sections.filter((section) =>
+    section.roles.includes(profile.role),
+  );
   const isMobilePresentation = deviceMode === "mobile";
 
   return (
     <div
       className={`mx-auto flex min-h-[calc(100vh-2.5rem)] w-full flex-col ${
-        isMobilePresentation ? "max-w-xl" : "max-w-6xl"
+        isMobilePresentation ? "max-w-3xl" : "max-w-6xl"
       }`}
       data-device-mode={deviceMode}
     >
@@ -60,7 +67,7 @@ export function CareDashboard({
             {profile.displayName}
           </p>
           <button
-            className="rounded-full border border-foreground/15 px-4 py-2 text-sm font-medium transition hover:border-foreground/35"
+            className="min-h-10 rounded-full border border-foreground/15 px-4 py-2 text-sm font-medium transition hover:border-foreground/35"
             onClick={onLogout}
             type="button"
           >
@@ -70,29 +77,21 @@ export function CareDashboard({
       </header>
 
       <main className="flex flex-1 flex-col">
-        <section className="mt-8 grid gap-8 overflow-hidden rounded-[2rem] bg-foreground px-6 py-10 text-background sm:mt-12 sm:px-12 sm:py-14 lg:grid-cols-[1.4fr_0.6fr] lg:items-end">
-          <div className="max-w-2xl">
-            <p className="mb-5 text-sm font-medium uppercase tracking-[0.2em] text-lime-200">
+        <section className="mt-7 flex flex-col gap-5 rounded-[2rem] bg-foreground px-6 py-7 text-background sm:mt-10 sm:flex-row sm:items-end sm:justify-between sm:px-10 sm:py-9">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.18em] text-lime-200">
               Una rutina compartida
             </p>
-            <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
-              Todo lo que necesita,{" "}
-              <span className="text-lime-200">en un solo lugar.</span>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-5xl">
+              Hola, {profile.displayName}
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-background/75 sm:text-lg">
-              Hola, {profile.displayName}. Aquí podrás coordinar su
-              alimentación, medicación, tareas y citas.
+            <p className="mt-3 max-w-xl text-sm leading-6 text-background/75 sm:text-base">
+              Alimentación, medicación, tareas y citas de Kiro, en un solo lugar.
             </p>
           </div>
-          <div className="rounded-3xl border border-background/15 bg-background/5 p-5 sm:p-6">
-            <p className="text-sm text-background/60">Presentación de sesión</p>
-            <p className="mt-2 text-lg font-medium">
-              {isMobilePresentation ? "Móvil" : "Ordenador"}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-background/70">
-              Puedes cambiar de dispositivo la próxima vez que inicies sesión.
-            </p>
-          </div>
+          <p className="shrink-0 rounded-2xl border border-background/15 bg-background/5 px-4 py-3 text-sm text-background/75">
+            Sesión en {isMobilePresentation ? "móvil" : "ordenador"}
+          </p>
         </section>
 
         {error ? (
@@ -101,47 +100,48 @@ export function CareDashboard({
           </p>
         ) : null}
 
-        <section aria-labelledby="care-areas-title" className="py-10 sm:py-14">
-          <div className="mb-6 flex flex-col gap-2 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground/55">
-                Todo organizado
-              </p>
-              <h2
-                className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl"
-                id="care-areas-title"
-              >
-                Sus cuidados, de un vistazo
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm leading-6 text-foreground/60">
-              Horarios e información compartidos para que nadie tenga que
-              recordar todo por su cuenta.
-            </p>
-          </div>
+        <nav
+          aria-label="Secciones de cuidados"
+          className="-mx-5 mt-6 flex gap-2 overflow-x-auto px-5 pb-2 sm:mx-0 sm:mt-8 sm:flex-wrap sm:overflow-visible sm:px-0"
+        >
+          {visibleSections.map((section) => (
+            <button
+              aria-current={activeSection === section.id ? "page" : undefined}
+              className={`min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold transition ${
+                activeSection === section.id
+                  ? "bg-foreground text-background"
+                  : "border border-foreground/10 bg-white/70 hover:border-foreground/30"
+              }`}
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
+              type="button"
+            >
+              {section.title}
+            </button>
+          ))}
+        </nav>
 
-          <div
-            className={`grid gap-3 ${
-              isMobilePresentation
-                ? "grid-cols-1"
-                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-            }`}
-          >
-            {careAreas.map((area) => (
-              <article
-                className="rounded-3xl border border-foreground/10 bg-white/70 p-5 sm:p-6"
-                key={area.number}
-              >
-                <p className="text-xs font-semibold tracking-[0.16em] text-foreground/45">
-                  {area.number}
-                </p>
-                <h3 className="mt-8 text-lg font-semibold">{area.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-foreground/60">
-                  {area.description}
-                </p>
-              </article>
-            ))}
-          </div>
+        <section className="flex-1 py-6 sm:py-8">
+          {activeSection === "today" ? (
+            <CareScheduleSection
+              mode="today"
+              profile={profile}
+              profiles={profiles}
+            />
+          ) : null}
+          {activeSection === "medications" ? (
+            <CareScheduleSection
+              mode="medications"
+              profile={profile}
+              profiles={profiles}
+            />
+          ) : null}
+          {activeSection === "calendar" ? <CareCalendar profile={profile} /> : null}
+          {activeSection === "notes" ? <CareNotes profiles={profiles} /> : null}
+          {activeSection === "history" ? <CareHistory /> : null}
+          {activeSection === "administration" && profile.role === "admin" ? (
+            <CareAdministration profiles={profiles} />
+          ) : null}
         </section>
       </main>
 

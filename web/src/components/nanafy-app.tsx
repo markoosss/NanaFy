@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { AuthenticatedProfile, ProfileRole } from "@/lib/auth/session";
 import { isRecord } from "@/lib/http/json";
+import { ActivationForm } from "@/components/activation-form";
 import { CareDashboard } from "@/components/care-dashboard";
 import { DeviceChoice } from "@/components/device-choice";
 import type { DeviceMode } from "@/components/app-types";
@@ -279,6 +280,7 @@ export function NanaFyApp() {
           error={actionError}
           onLogout={handleLogout}
           profile={authenticatedProfile}
+          profiles={profiles}
         />
       </main>
     );
@@ -325,25 +327,28 @@ export function NanaFyApp() {
                 profile={selectedProfile}
               />
             ) : (
-              <section className="mx-auto w-full max-w-lg rounded-[2rem] border border-foreground/10 bg-white/80 p-6 shadow-sm sm:p-9">
-                <h1 className="text-2xl font-semibold tracking-tight">
-                  Perfil pendiente de activación
-                </h1>
-                <p className="mt-3 text-sm leading-6 text-foreground/60">
-                  Pide a Marcos un código para activar el perfil de{" "}
-                  {selectedProfile.displayName}.
-                </p>
-                <button
-                  className="mt-6 min-h-12 rounded-xl border border-foreground/15 px-5 font-medium"
-                  onClick={() => {
-                    setSelectedProfile(null);
-                    setScreen("profiles");
-                  }}
-                  type="button"
-                >
-                  Volver a perfiles
-                </button>
-              </section>
+              <ActivationForm
+                onActivated={async (password) => {
+                  const activatedProfile = {
+                    ...selectedProfile,
+                    isActivated: true,
+                  };
+                  setSelectedProfile(activatedProfile);
+                  setProfiles((currentProfiles) =>
+                    currentProfiles.map((profile) =>
+                      profile.profileKey === activatedProfile.profileKey
+                        ? activatedProfile
+                        : profile,
+                    ),
+                  );
+                  await handleLogin(password);
+                }}
+                onBack={() => {
+                  setSelectedProfile(null);
+                  setScreen("profiles");
+                }}
+                profile={selectedProfile}
+              />
             )
           ) : null}
 

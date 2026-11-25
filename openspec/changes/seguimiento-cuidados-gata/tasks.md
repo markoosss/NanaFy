@@ -21,11 +21,11 @@
 
 ## 4. Interfaz web
 
-- [ ] 4.1 Crear la pantalla de perfiles y los flujos de activación y contraseña; verificar navegación y validaciones en pruebas de interfaz.
-- [ ] 4.2 Crear las vistas de alimentación, medicación, tareas, calendario e historial con presentación móvil y PC; verificar que cada módulo cumple sus escenarios de especificación.
-- [ ] 4.3 Añadir notas y controles de administración visibles solo para perfiles autorizados; verificar que la interfaz refleja los permisos de la API y se adapta a ambos tamaños de pantalla.
+- [x] 4.1 Crear la pantalla de perfiles y los flujos de activación y contraseña; verificar navegación y validaciones en pruebas de interfaz.
+- [x] 4.2 Crear las vistas de alimentación, medicación, tareas, calendario e historial con presentación móvil y PC; verificar que cada módulo cumple sus escenarios de especificación.
+- [x] 4.3 Añadir notas y controles de administración visibles solo para perfiles autorizados; verificar que la interfaz refleja los permisos de la API y se adapta a ambos tamaños de pantalla.
 
 ## 5. Integración y publicación
 
-- [ ] 5.1 Ejecutar pruebas de extremo a extremo con los cinco perfiles; verificar activación, permisos, registro de cuidados y persistencia de datos compartidos.
+- [x] 5.1 Ejecutar pruebas de extremo a extremo con los cinco perfiles; verificar activación, permisos, registro de cuidados y persistencia de datos compartidos.
 - [ ] 5.2 Decidir con Marcos si usar un dominio propio o los dominios del proveedor; desplegar cliente, API y base de datos; verificar acceso HTTPS desde móvil y PC, sincronización entre dispositivos y restauración de una copia de seguridad.

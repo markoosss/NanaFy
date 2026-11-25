@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { POST, PATCH } from "./route";
+import { GET, POST, PATCH } from "./route";
 import type { AuthenticatedProfile } from "@/lib/auth/session";
 
 const { mockFetch, mockGetCurrentProfile } = vi.hoisted(() => ({
@@ -55,6 +55,69 @@ beforeEach(() => {
 });
 
 describe("care schedule administration API", () => {
+  it("returns all schedule types and medication times to Marcos", async () => {
+    mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
+      const { pathname } = new URL(getRequestUrl(input));
+      if (pathname.endsWith("/feeding_schedules")) {
+        return Response.json([
+          {
+            id: scheduleId,
+            meal_name: "Desayuno",
+            portion: "Una ración",
+            day_of_week: 1,
+            scheduled_time: "08:00:00",
+            is_active: true,
+          },
+        ]);
+      }
+      if (pathname.endsWith("/medication_schedules")) {
+        return Response.json([
+          {
+            id: "c4ef0afe-8d61-49ac-bf9e-00a94b411de2",
+            medication_name: "Tratamiento",
+            instructions: "Con comida",
+            start_date: "2026-01-05",
+            end_date: null,
+            is_active: true,
+          },
+        ]);
+      }
+      if (pathname.endsWith("/care_tasks")) {
+        return Response.json([]);
+      }
+      if (pathname.endsWith("/medication_schedule_times")) {
+        return Response.json([
+          {
+            medication_schedule_id: "c4ef0afe-8d61-49ac-bf9e-00a94b411de2",
+            day_of_week: 1,
+            scheduled_time: "09:00:00",
+          },
+        ]);
+      }
+
+      throw new Error(`Unexpected Supabase request: ${pathname}`);
+    });
+
+    const response = await GET();
+    const result = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(result.schedules).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "feeding",
+          mealName: "Desayuno",
+          isActive: true,
+        }),
+        expect.objectContaining({
+          kind: "medication",
+          medicationName: "Tratamiento",
+          times: [{ dayOfWeek: 1, scheduledTime: "09:00:00" }],
+        }),
+      ]),
+    );
+  });
+
   it("allows Marcos to create medication instructions and planned times", async () => {
     mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
       const { pathname } = new URL(getRequestUrl(input));

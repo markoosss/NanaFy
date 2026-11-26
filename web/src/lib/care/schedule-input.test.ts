@@ -20,6 +20,47 @@ describe("care schedule input validation", () => {
     });
   });
 
+  it("normalizes database medication times with seconds when editing a schedule", () => {
+    expect(
+      parseCareScheduleInput({
+        kind: "medication",
+        medicationName: "Medicación",
+        instructions: "Con comida",
+        startDate: "2026-11-25",
+        endDate: null,
+        times: [
+          { dayOfWeek: 3, scheduledTime: "08:30:00" },
+          { dayOfWeek: 3, scheduledTime: "20:45:12.250000" },
+        ],
+        isActive: true,
+        id: "550e8400-e29b-41d4-a716-446655440000",
+      }),
+    ).toMatchObject({
+      kind: "medication",
+      times: [
+        { dayOfWeek: 3, scheduledTime: "08:30" },
+        { dayOfWeek: 3, scheduledTime: "20:45" },
+      ],
+    });
+  });
+
+  it("rejects duplicate medication times after normalizing seconds", () => {
+    expect(
+      parseCareScheduleInput({
+        kind: "medication",
+        medicationName: "Medicación",
+        instructions: "Con comida",
+        startDate: "2026-11-25",
+        endDate: null,
+        times: [
+          { dayOfWeek: 3, scheduledTime: "08:30" },
+          { dayOfWeek: 3, scheduledTime: "08:30:00" },
+        ],
+        isActive: true,
+      }),
+    ).toBeNull();
+  });
+
   it("rejects invalid days, dates, times, and duplicate medication times", () => {
     expect(
       parseCareScheduleInput({

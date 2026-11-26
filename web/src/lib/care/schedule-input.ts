@@ -35,7 +35,8 @@ export type CareScheduleInput =
       times: ScheduleTime[];
     });
 
-const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+const TIME_PATTERN =
+  /^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d{1,6})?)?$/;
 
 function isNonEmptyText(value: unknown, maxLength: number): value is string {
   return (
@@ -70,6 +71,10 @@ function isValidTime(value: unknown): value is string {
   return typeof value === "string" && TIME_PATTERN.test(value);
 }
 
+function normalizeTime(value: string): string {
+  return value.slice(0, 5);
+}
+
 function parseTimes(value: unknown): ScheduleTime[] | null {
   if (!Array.isArray(value) || value.length === 0) {
     return null;
@@ -87,7 +92,8 @@ function parseTimes(value: unknown): ScheduleTime[] | null {
       return null;
     }
 
-    const key = `${entry.dayOfWeek}:${entry.scheduledTime}`;
+    const scheduledTime = normalizeTime(entry.scheduledTime);
+    const key = `${entry.dayOfWeek}:${scheduledTime}`;
     if (uniqueTimes.has(key)) {
       return null;
     }
@@ -95,7 +101,7 @@ function parseTimes(value: unknown): ScheduleTime[] | null {
     uniqueTimes.add(key);
     times.push({
       dayOfWeek: entry.dayOfWeek,
-      scheduledTime: entry.scheduledTime,
+      scheduledTime,
     });
   }
 

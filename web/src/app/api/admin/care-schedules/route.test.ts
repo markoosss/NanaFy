@@ -183,6 +183,42 @@ describe("care schedule administration API", () => {
     expect(missing.status).toBe(404);
   });
 
+  it("allows renaming medication without failing on database times with seconds", async () => {
+    mockFetch.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const { pathname } = new URL(getRequestUrl(input));
+      if (pathname.endsWith("/rpc/save_medication_schedule")) {
+        expect(JSON.parse(String(init?.body))).toMatchObject({
+          p_id: scheduleId,
+          p_medication_name: "Tratamiento actualizado",
+          p_times: [{ dayOfWeek: 1, scheduledTime: "09:00" }],
+        });
+        return Response.json(scheduleId);
+      }
+
+      throw new Error(`Unexpected Supabase request: ${pathname}`);
+    });
+
+    const response = await PATCH(
+      new Request("http://localhost/api/admin/care-schedules", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: scheduleId,
+          kind: "medication",
+          medicationName: "Tratamiento actualizado",
+          instructions: "Con comida",
+          startDate: "2026-01-05",
+          endDate: null,
+          isActive: true,
+          times: [{ dayOfWeek: 1, scheduledTime: "09:00:00" }],
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ id: scheduleId });
+  });
+
   it("denies Invitado before writing a care schedule", async () => {
     mockGetCurrentProfile.mockResolvedValue(guestProfile);
 
